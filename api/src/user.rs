@@ -47,7 +47,7 @@ where
             r#"
                 SELECT users.*
                 FROM tokens
-                LEFT JOIN users
+                JOIN users
                 ON tokens.user_id = users.id
                 WHERE token = $1
             "#,
