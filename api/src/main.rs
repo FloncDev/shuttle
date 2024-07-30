@@ -1,4 +1,4 @@
-use api::AppState;
+use api::{routers, AppState};
 use axum::{extract::MatchedPath, http::Request, routing::get, Router};
 use tower_http::trace::TraceLayer;
 
@@ -8,6 +8,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(|| async { "Hello World" }))
+        .merge(routers::get_router())
         .layer(
             TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
                 let matched_path = request

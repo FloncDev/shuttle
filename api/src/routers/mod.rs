@@ -1,7 +1,7 @@
+pub mod user;
+use crate::AppState;
 use axum::Router;
 
-use crate::AppState;
-
 pub fn get_router() -> Router<AppState> {
-    Router::new()
+    Router::new().merge(user::get_router())
 }

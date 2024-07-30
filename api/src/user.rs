@@ -4,13 +4,20 @@ use axum::{
     http::{request::Parts, StatusCode},
 };
 use axum_extra::extract::CookieJar;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 use crate::AppState;
 
-pub struct Session;
+#[derive(Debug, Serialize, Deserialize)]
+pub struct User {
+    pub id: i32,
+    pub name: String,
+    pub created_at: DateTime<Utc>,
+}
 
 #[async_trait]
-impl<S> FromRequestParts<S> for Session
+impl<S> FromRequestParts<S> for User
 where
     S: Send + Sync,
     AppState: axum::extract::FromRef<S>,
@@ -35,6 +42,19 @@ where
         }
         .to_string();
 
-        Ok(Session {})
+        sqlx::query_as!(
+            User,
+            r#"
+                SELECT users.*
+                FROM tokens
+                LEFT JOIN users
+                ON tokens.user_id = users.id
+                WHERE token = $1
+            "#,
+            token
+        )
+        .fetch_one(&app_state.pool)
+        .await
+        .map_err(|_| (StatusCode::UNAUTHORIZED, "Invalid Authorization token"))
     }
 }
