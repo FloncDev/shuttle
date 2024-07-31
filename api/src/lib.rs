@@ -1,9 +1,9 @@
 pub mod routers;
-pub mod user;
+pub mod models;
 
 use dotenvy::var;
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
-pub use user::User;
+pub use models::User;
 
 #[derive(Clone)]
 pub struct AppState {
