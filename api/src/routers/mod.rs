@@ -1,4 +1,6 @@
+pub mod game;
 pub mod user;
+
 use crate::AppState;
 use axum::Router;
 
