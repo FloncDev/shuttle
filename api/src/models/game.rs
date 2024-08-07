@@ -4,13 +4,19 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{postgres::PgRow, types::Json, FromRow, Row};
 
-use crate::User;
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Player {
+    pub id: i32,
+    pub name: String,
+    pub rating: f64,
+    pub uncertainty: f64,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Team {
     pub id: i32,
-    pub player_one: User,
-    pub player_two: User,
+    pub player_one: Player,
+    pub player_two: Player,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,8 +37,8 @@ pub struct SoloGame {
     pub id: i32,
     pub created_at: DateTime<Utc>,
     pub first_to: i32,
-    pub player_one: User,
-    pub player_two: User,
+    pub player_one: Player,
+    pub player_two: Player,
     pub sets: Json<Vec<[i32; 2]>>,
 }
 
@@ -43,16 +49,18 @@ impl<'r> FromRow<'r, PgRow> for SoloGame {
         let first_to = row.try_get("first_to")?;
         let sets = row.try_get("sets")?;
 
-        let player_one = User {
+        let player_one = Player {
             id: row.try_get("p1_id")?,
             name: row.try_get("p1_name")?,
-            created_at: row.try_get("p1_created_at")?,
+            rating: row.try_get("p1_rating")?,
+            uncertainty: row.try_get("p1_uncertainty")?,
         };
 
-        let player_two = User {
+        let player_two = Player {
             id: row.try_get("p2_id")?,
             name: row.try_get("p2_name")?,
-            created_at: row.try_get("p2_created_at")?,
+            rating: row.try_get("p2_rating")?,
+            uncertainty: row.try_get("p2_uncertainty")?,
         };
 
         Ok(SoloGame {
