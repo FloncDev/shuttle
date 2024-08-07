@@ -4,9 +4,9 @@ use axum::{
     Json, Router,
 };
 
-use crate::{AppState, SoloGame, User};
+use crate::{AppState, Result, SoloGame, User};
 
-async fn get_games(State(state): State<AppState>) -> Result<Json<Vec<SoloGame>>, ()> {
+async fn get_games(State(state): State<AppState>) -> Result<Json<Vec<SoloGame>>> {
     let games: Vec<SoloGame> = sqlx::query_as(
         r#"
             select g.id, g.created_at, g.first_to, g.sets,
@@ -22,13 +22,12 @@ async fn get_games(State(state): State<AppState>) -> Result<Json<Vec<SoloGame>>,
         "#,
     )
     .fetch_all(&state.pool)
-    .await
-    .unwrap();
+    .await?;
 
     Ok(Json(games))
 }
 
-async fn get_game(State(state): State<AppState>, Path(id): Path<i32>) -> Json<SoloGame> {
+async fn get_game(State(state): State<AppState>, Path(id): Path<i32>) -> Result<Json<SoloGame>> {
     let game: SoloGame = sqlx::query_as(
         r#"
             select g.id, g.created_at, g.first_to, g.sets,
@@ -46,10 +45,9 @@ async fn get_game(State(state): State<AppState>, Path(id): Path<i32>) -> Json<So
     )
     .bind(id)
     .fetch_one(&state.pool)
-    .await
-    .unwrap();
+    .await?;
 
-    Json(game)
+    Ok(Json(game))
 }
 
 async fn post_game(State(state): State<AppState>, _: User, game: Json<SoloGame>) -> Json<SoloGame> {

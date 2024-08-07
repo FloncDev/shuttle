@@ -4,9 +4,9 @@ use axum::{
     Json, Router,
 };
 
-use crate::{AppState, DuoGame, User};
+use crate::{AppState, DuoGame, Result, User};
 
-async fn get_games(State(state): State<AppState>) -> Json<Vec<DuoGame>> {
+async fn get_games(State(state): State<AppState>) -> Result<Json<Vec<DuoGame>>> {
     let games_db = sqlx::query!(
         r#"
             SELECT
@@ -34,10 +34,7 @@ async fn get_games(State(state): State<AppState>) -> Json<Vec<DuoGame>> {
         "#
     )
     .fetch_all(&state.pool)
-    .await
-    .unwrap();
-
-    println!("{:#?}", games_db);
+    .await?;
 
     todo!();
 }
