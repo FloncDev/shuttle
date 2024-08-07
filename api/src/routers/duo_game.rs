@@ -37,12 +37,12 @@ async fn get_games(State(state): State<AppState>) -> Result<Json<Vec<DuoGame>>> 
 
             FROM duo_games
             JOIN teams t1 ON t1.id = duo_games.team_one
-            JOIN users t1p1 ON t1.player_one = t1p1.id
-            LEFT JOIN users t1p2 ON t1.player_two = t1p2.id
+            JOIN players t1p1 ON t1.player_one = t1p1.id
+            JOIN players t1p2 ON t1.player_two = t1p2.id
 
             JOIN teams t2 ON t2.id = duo_games.team_two
-            JOIN users t2p1 ON t2.player_one = t2p1.id
-            LEFT JOIN users t2p2 ON t2.player_two = t2p2.id
+            JOIN players t2p1 ON t2.player_one = t2p1.id
+            JOIN players t2p2 ON t2.player_two = t2p2.id
         "#,
         )
         .fetch_all(&state.pool)
